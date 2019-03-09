@@ -1,5 +1,5 @@
 from Tkinter import *
-import subprocess
+import pyperclip
 
 master = Tk()
 miFrame=Frame(master, width=500, height=400)
@@ -10,28 +10,37 @@ miFrame.pack()
 #label = Label(miFrame)
 #label.pack()
 
-def elOk(item):
-    print(item)
+history = []
+
+def createButton(itemText):
+    global history
+    
+    try:
+        history.index(recent_value) >= 0
+    except:
+        history.append(recent_value)
+        Button(miFrame, text=itemText, width=25, command=lambda:setClipboardData(itemText)).pack()
+    else:
+        print(history)
 
 def getClipboardData():
-    p = subprocess.Popen(['xclip','-selection', 'clipboard', '-o'], stdout=subprocess.PIPE)
-    retcode = p.wait()
-    data = p.stdout.read()
+    data = pyperclip.paste()
     return data
 
+def setClipboardData(thedata):
+    print(thedata)
+    pyperclip.copy(thedata)
+
 def my_mainloop():
-    global recent_value  
-    global i    
+    global recent_value      
     tmp_value = getClipboardData()
+
     if tmp_value != recent_value:
-        i=i+1
-        recent_value = tmp_value
-        print("Value changed: %s" % str(recent_value)[:20]) 
-        Button(miFrame, text=recent_value, width=25, command=elOk("pepe")).pack()
-        #text.insert(END, recent_value +str(i))
+       recent_value = tmp_value 
+       createButton(recent_value)
+     #   print("Value changed: %s" % str(recent_value)[:20])
     master.after(1000, my_mainloop)    
 
-i=0
 recent_value = getClipboardData()
 
 master.after(1000, my_mainloop)
